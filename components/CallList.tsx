@@ -44,7 +44,7 @@ const CallList = ({type}:{type:'ended'| 'upcoming' | 'recordings'}) => {
         const fetchRecordings = async () => {
 
             try {
-                const callData = await Promise.all(callRecordings.map((meeting) => meeting.queryRecordings()))
+                const callData = await Promise.all(callRecordings?.map((meeting) => meeting.queryRecordings()) ?? [],);
     
                 const recordings = callData
                 .filter(call=> call.recordings.length>0)
@@ -73,9 +73,9 @@ const CallList = ({type}:{type:'ended'| 'upcoming' | 'recordings'}) => {
   return (
     <div className='grid grid-cols-1 gap-5 xl:grid-cols-2  rounded-xl shadow-lg shadow-slate-950 '>    
         {calls && calls.length > 0 ? 
-            calls.map((meeting:Call|CallRecording)=>(
+            calls.map((meeting:Call|CallRecording , index)=>(
                 <MeetingCard
-                key={(meeting as Call).id} 
+                key={(meeting as Call).id || index} 
                 icon={
                     type=== 'ended'
                     ? 'previous.svg'
@@ -83,13 +83,13 @@ const CallList = ({type}:{type:'ended'| 'upcoming' | 'recordings'}) => {
                     ? 'upcoming.svg'
                     : 'recordings.svg'
                 }
-                title={(meeting as Call).state?.custom?.description?.substring(0,20) || meeting?.filename?.substring(0,20) || 'Personal Meeting'}
-                date={meeting.state?.startsAt.toLocaleString() || meeting.start_time.toLocaleString()}
+                title={(meeting as Call).state?.custom?.description || (meeting as CallRecording)?.filename?.substring(0,20) || 'Personal Meeting'}
+                date={(meeting as Call).state?.startsAt?.toLocaleString() || (meeting as CallRecording).start_time?.toLocaleString()}
                 isPreviousMeeting={type === 'ended'}
                 buttonIcon1={type==='recordings' ? 'play.svg' : undefined}
                 buttonText={type==='recordings'? 'Play':'Start'}
-                handleClick={type === 'recordings' ? ()=> router.push(`${meeting.url}`) : ()=> router.push(`/meeting/${meeting.id}`) }
-                link={type ==='recordings' ? meeting.url : `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meeting.id}`}
+                handleClick={type === 'recordings' ? ()=> router.push(`${(meeting as CallRecording).url}`) : ()=> router.push(`/meeting/${(meeting as Call).id}`) }
+                link={type ==='recordings' ? (meeting as CallRecording).url : `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${(meeting as Call).id}`}
                 />
             )):(
                 <h1>{noCallsMessage}</h1>

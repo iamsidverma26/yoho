@@ -4,12 +4,13 @@ import React from 'react'
 const Loader = () => {
   return (
     <div className='flex-center h-screen w-full '>
-        <Image
-            src="/loader.svg"
-            alt="Loading"
-            width={50}
-            height={50}
-        />
+      <Image
+        src="/loader.svg"
+        alt="Loading"
+        width={50}
+        height={50}
+        className='animate-spin'
+      />
     </div>
   )
 }
